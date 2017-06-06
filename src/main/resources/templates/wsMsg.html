@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>WebScoket广播</title>
+</head>
+<body onload="disconnect()">
+<noscript>
+    <h2 style="color:#ff0000">您的浏览器不支持！</h2>
+</noscript>
+<div>
+    <div>
+        <button id="connect" onclick="connect();">链接</button>
+        <button id="disConnect" disabled="disabled" onclick="disconnect();">断开</button>
+    </div>
+    <div id="converstationDiv">
+        <label>输入你的名字</label><input type="text" id="name"/>
+        <button id="sendName" onclick="sendName();">发送</button>
+        <p id="response"></p>
+    </div>
+</div>
+<script th:src="@{sockjs.js}"></script>
+<script th:src="@{stomp.js}"></script>
+<script th:src="@{jquery-1.10.2.js}"></script>
+<script type="text/javascript">
+    var stompClient = null;
+    function setConnected(connected) {
+        document.getElementById('connect').style.disabled=connected;
+        document.getElementById('disConnect').style.disabled=!connected;
+        document.getElementById('converstationDiv').style.visibility = connected ? 'visible' : 'hidden';
+        $('#response').html();
+    }
+
+    function connect() {
+        var socket = new SockJS('/endpointWs');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({},function (frame) {
+            setConnected(true);
+            console.log('Connected: '+frame);
+            stompClient.subscribe('/topic/getResponse',function (response) {
+                showResponse(JSON.parse(response.body).responseMessage);
+            })
+        });
+
+    }
+
+    function disconnect() {
+        if(stompClient != null){
+            stompClient.disconnect();
+        }
+        setConnected(false);
+        console.log('Disconnected!');
+    }
+
+    function sendName() {
+        var name = $("#name").val();
+        stompClient.send('wsMessage',{},JSON.stringify({'name':name}));
+    }
+
+    function showResponse(message) {
+        var response = $('#response');
+        response.html(message);
+    }
+</script>
+</body>
+</html>
