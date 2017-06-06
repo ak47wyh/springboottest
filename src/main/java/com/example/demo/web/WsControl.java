@@ -34,6 +34,7 @@ public class WsControl {
     private SimpMessagingTemplate msgTemplate;
 
 //    chat
+    @MessageMapping("/chat")
     public void handleChat(Principal principal,String msg){
         if(principal.getName().equals("admin")){
             msgTemplate.convertAndSendToUser("wyh","queue/notifications",principal.getName()+"-send:"+msg);

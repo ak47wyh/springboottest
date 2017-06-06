@@ -6,7 +6,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 
 /**
  * Created by Administrator on 2017/6/5.
@@ -35,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("wyh").password("wyh").roles("admin")
                 .and().withUser("admin").password("admin").roles("admin");
     }
-
+    @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resource/static/**");
     }
